@@ -30,9 +30,9 @@ function searchMeal(e) {
 						.map(
 							(meal) => `
 					<div class="meal">
-					<img src="${meal.strMealThumb}" alt="${meal.strMeal}"/>
+					<img src="${meal.strMealThumb}" alt="${meal.strMeal}" />
 					<div class="meal-info" data-mealID="${meal.idMeal}">
-					<h3>${meal.strMeal}</h3>
+					<h3 data-mealID="${meal.idMeal}">${meal.strMeal}</h3>
 					</div>
 					</div>`
 						)
@@ -46,4 +46,46 @@ function searchMeal(e) {
 	}
 }
 
+//fetch meal by id
+function getMealByID(mealID) {
+	fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealID}`)
+		.then((res) => res.json())
+		.then((data) => {
+			const meal = data.meals[0];
+
+			addMealToDom(meal);
+		});
+}
+//add meal to dom
+function addMealToDom(meal) {
+	const ingredients = [];
+	for (let i = 1; i <= 20; i++) {
+		if (meal[`strIngredient${i}`]) {
+			ingredients.push(
+				`${meal[`strIngredient${i}`]} - ${meal[`strMeasures${i}`]}`
+			);
+		} else {
+			break;
+		}
+	}
+
+	single_mealEl.innerHTML = `< class="single-meal">
+	<h1>${meal.strMeal}</h1>
+	<img src="${meal.strMealThumb}" alt="${meal.strMeal}" />
+	<div class="single-meal-info">
+	${meal.strCategory ? `<p>${meal.strCategory}</p>` : ''}
+	${meal.strArea ? `<p>${meal.strArea}</p>` : ''}
+	</div>
+	<div class="main">
+	<p></p>
+	</div>
+	</div>`;
+	console.log(meal.strMeal);
+}
 submit.addEventListener('submit', searchMeal);
+
+mealsEl.addEventListener('click', (e) => {
+	const mealID = e.target.getAttribute('data-mealid') || '';
+	console.log({ mealID });
+	getMealByID(mealID);
+});
